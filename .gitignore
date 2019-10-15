@@ -1,8 +1,9 @@
-.idea
-*.iml
-*.idea
-*.core.prefs
+.idea/
 *.DS_Store
+*.core.prefs
+*.idea
+*.iml
+*.log
 *.old
 
 .git
