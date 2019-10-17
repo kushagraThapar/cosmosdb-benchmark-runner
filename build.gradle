@@ -9,6 +9,7 @@ wrapper {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'maven'
 
     ext {
         cosmosAsyncVersion = project.hasProperty('cosmosAsyncVersion') ? project.getProperty('cosmosAsyncVersion') : '2.6.3-SNAPSHOT'
@@ -44,7 +45,6 @@ project(':benchmark') {
     shadowJar {
         classifier = 'shadow'
         append 'reference.conf'
-
     }
 
     task jmh(type: JavaExec, dependsOn: [':benchmark:clean', ':benchmark:shadowJar']) {

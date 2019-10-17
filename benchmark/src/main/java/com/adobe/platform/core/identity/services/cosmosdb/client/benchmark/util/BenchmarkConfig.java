@@ -29,7 +29,7 @@ public class BenchmarkConfig {
         }
     }
 
-    public String jvmArgs;
+    public String[] jvmArgs;
     public String jmhArgs;
     public List<Run> runList;
     public String resultsPath;
@@ -40,7 +40,7 @@ public class BenchmarkConfig {
     }
 
     public BenchmarkConfig(Config config) {
-        this.jvmArgs = config.getString(CONFIG_PREFIX + ".params.jvmArgs");
+        this.jvmArgs = config.getStringList(CONFIG_PREFIX + ".params.jvmArgs").toArray(new String[0]);
         this.jmhArgs = config.getString(CONFIG_PREFIX + ".params.jmhArgs");
         this.resultsPath = config.getString(CONFIG_PREFIX + ".params.resultsPath");
         this.summaryCsvFile = config.getString(CONFIG_PREFIX + ".params.summaryCsvFile");
