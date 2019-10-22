@@ -1,21 +1,45 @@
 package com.adobe.platform.core.identity.services.cosmosdb.client;
 
 import com.adobe.platform.core.identity.services.cosmosdb.util.CosmosDbException;
-import com.microsoft.azure.cosmosdb.*;
+import com.microsoft.azure.cosmosdb.ConnectionMode;
+import com.microsoft.azure.cosmosdb.ConnectionPolicy;
+import com.microsoft.azure.cosmosdb.ConsistencyLevel;
+import com.microsoft.azure.cosmosdb.Database;
+import com.microsoft.azure.cosmosdb.Document;
+import com.microsoft.azure.cosmosdb.DocumentClientException;
+import com.microsoft.azure.cosmosdb.DocumentCollection;
+import com.microsoft.azure.cosmosdb.FeedOptions;
+import com.microsoft.azure.cosmosdb.FeedResponse;
+import com.microsoft.azure.cosmosdb.IndexingMode;
+import com.microsoft.azure.cosmosdb.IndexingPolicy;
+import com.microsoft.azure.cosmosdb.PartitionKey;
+import com.microsoft.azure.cosmosdb.PartitionKeyDefinition;
+import com.microsoft.azure.cosmosdb.QueryMetricsConstants;
+import com.microsoft.azure.cosmosdb.RequestOptions;
+import com.microsoft.azure.cosmosdb.ResourceResponse;
+import com.microsoft.azure.cosmosdb.SqlParameter;
+import com.microsoft.azure.cosmosdb.SqlParameterCollection;
+import com.microsoft.azure.cosmosdb.SqlQuerySpec;
 import com.microsoft.azure.cosmosdb.internal.HttpConstants;
-import com.microsoft.azure.cosmosdb.internal.directconnectivity.RequestRateTooLargeException;
+import com.microsoft.azure.cosmosdb.internal.directconnectivity.RequestTimeoutException;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class AsyncCosmosDbClient implements CosmosDbClient {
 
@@ -196,20 +220,17 @@ public class AsyncCosmosDbClient implements CosmosDbClient {
     public CosmosDbConfig getConfig(){ return this.cfg; }
 
     public Observable<ResourceResponse<Document>> getDocument(String collectionName, String docId){
-        return client.readDocument(cfg.getDocumentLink(collectionName, docId), getRequestOptions(docId));
-//                .retryWhen(errors -> errors.flatMap(error -> {
-//                            // For IOExceptions, we  retry
-//                            if (error.getCause() instanceof RequestRateTooLargeException) {
-//                                RequestRateTooLargeException rrEx = (RequestRateTooLargeException) error.getCause();
-//                                return Observable.just(null).delay(rrEx.getRetryAfterInMilliseconds(), TimeUnit.MILLISECONDS);
-//                            } else {
-//                                logger.error("Error in getDocument()", error);
-//                            }
-//
-//                            // For anything else, don't retry
-//                            return Observable.error(error);
-//                        })
-//                );
+        return client.readDocument(cfg.getDocumentLink(collectionName, docId), getRequestOptions(docId))
+            .retryWhen(errors -> errors.flatMap(error -> {
+                if (error.getCause() instanceof RequestTimeoutException) {
+                    RequestTimeoutException timeoutException = (RequestTimeoutException) error.getCause();
+                    return Observable.just(null).delay(timeoutException.getRetryAfterInMilliseconds(), TimeUnit.MILLISECONDS);
+                } else {
+                    logger.error("Error in getDocument()", error);
+                }
+                // For anything else, don't retry
+                return Observable.error(error);
+            }));
     }
 
     @Override
