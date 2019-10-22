@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class AsyncCosmosDbClient implements CosmosDbClient {
@@ -219,17 +220,22 @@ public class AsyncCosmosDbClient implements CosmosDbClient {
     @Override
     public CosmosDbConfig getConfig(){ return this.cfg; }
 
-    public Observable<ResourceResponse<Document>> getDocument(String collectionName, String docId){
+    public Observable<ResourceResponse<Document>> getDocument(String collectionName, String docId) {
+        final AtomicBoolean retried = new AtomicBoolean();
         return client.readDocument(cfg.getDocumentLink(collectionName, docId), getRequestOptions(docId))
             .retryWhen(errors -> errors.flatMap(error -> {
-                if (error.getCause() instanceof RequestTimeoutException) {
-                    RequestTimeoutException timeoutException = (RequestTimeoutException) error.getCause();
-                    return Observable.just(null).delay(timeoutException.getRetryAfterInMilliseconds(), TimeUnit.MILLISECONDS);
+                if (error instanceof RequestTimeoutException) {
+                    if (retried.compareAndSet(true, true)) {
+                        logger.error("retried document read failed: ", error);
+                        return Observable.error(error);
+                    }
+                    RequestTimeoutException timeoutException = (RequestTimeoutException) error;
+                    long milliseconds = timeoutException.getRetryAfterInMilliseconds();
+                    return Observable.just(null).delay(milliseconds, TimeUnit.MILLISECONDS);
                 } else {
-                    logger.error("Error in getDocument()", error);
+                    logger.error("document read failed: ", error);
                 }
-                // For anything else, don't retry
-                return Observable.error(error);
+                return Observable.error(error); // accept any error other than a request timeout
             }));
     }
 
