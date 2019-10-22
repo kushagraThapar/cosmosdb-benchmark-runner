@@ -61,7 +61,7 @@ public class TwoTableWorkload extends AbstractWorkload{
     public void workloadTeardown() {
         try {
             client.close();
-            Thread.sleep(5000); //Async client has stray (netty) threads after calling close. //todo
+            Thread.sleep(15000); // Async client has stray (netty) threads after calling close. //todo
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

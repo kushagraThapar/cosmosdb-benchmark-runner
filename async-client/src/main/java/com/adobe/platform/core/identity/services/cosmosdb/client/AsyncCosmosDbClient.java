@@ -196,20 +196,20 @@ public class AsyncCosmosDbClient implements CosmosDbClient {
     public CosmosDbConfig getConfig(){ return this.cfg; }
 
     public Observable<ResourceResponse<Document>> getDocument(String collectionName, String docId){
-        return client.readDocument(cfg.getDocumentLink(collectionName, docId), getRequestOptions(docId))
-                .retryWhen(errors -> errors.flatMap(error -> {
-                            // For IOExceptions, we  retry
-                            if (error.getCause() instanceof RequestRateTooLargeException) {
-                                RequestRateTooLargeException rrEx = (RequestRateTooLargeException) error.getCause();
-                                return Observable.just(null).delay(rrEx.getRetryAfterInMilliseconds(), TimeUnit.MILLISECONDS);
-                            } else {
-                                logger.error("Error in getDocument()", error);
-                            }
-
-                            // For anything else, don't retry
-                            return Observable.error(error);
-                        })
-                );
+        return client.readDocument(cfg.getDocumentLink(collectionName, docId), getRequestOptions(docId));
+//                .retryWhen(errors -> errors.flatMap(error -> {
+//                            // For IOExceptions, we  retry
+//                            if (error.getCause() instanceof RequestRateTooLargeException) {
+//                                RequestRateTooLargeException rrEx = (RequestRateTooLargeException) error.getCause();
+//                                return Observable.just(null).delay(rrEx.getRetryAfterInMilliseconds(), TimeUnit.MILLISECONDS);
+//                            } else {
+//                                logger.error("Error in getDocument()", error);
+//                            }
+//
+//                            // For anything else, don't retry
+//                            return Observable.error(error);
+//                        })
+//                );
     }
 
     @Override
