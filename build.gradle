@@ -12,7 +12,7 @@ allprojects {
     apply plugin: 'maven'
 
     ext {
-        cosmosAsyncVersion = project.hasProperty('cosmosAsyncVersion') ? project.getProperty('cosmosAsyncVersion') : '2.6.3'
+        cosmosAsyncVersion = project.hasProperty('cosmosAsyncVersion') ? project.getProperty('cosmosAsyncVersion') : '2.6.3-SNAPSHOT'
     }
 
     group = 'com.adobe.platform.core.identity.services'
