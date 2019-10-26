@@ -2,6 +2,7 @@ package com.adobe.platform.core.identity.services.cosmosdb.client.benchmark.work
 
 import com.adobe.platform.core.identity.services.cosmosdb.client.*;
 import com.adobe.platform.core.identity.services.cosmosdb.util.ThrowingSupplier;
+import com.azure.data.cosmos.CosmosClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,26 +35,41 @@ public class TwoTableWorkload extends AbstractWorkload{
     }
 
     public synchronized void workloadSetup(){
-        AsyncCosmosDbClient asyncClient = new AsyncCosmosDbClient(cosmosConfig);
-
-        // These function only work with async client for now. todo
-        asyncClient.verifyCollectionsExist(Arrays.asList(routingCollectionName, graphCollectionName));
-
-        // Get keys from each partition for querying
-        idsPerPartition = asyncClient.getIdsPerPartition(routingCollectionName, MAX_IDS_TO_FETCH_PER_PARTITION)
-                        .toBlocking().single();
-        int partitionCount = idsPerPartition.size();
-        long docCount = idsPerPartition.stream().flatMap(List::stream).count();
-        logger.info("Fetched {} ids from {} partitions.", docCount, partitionCount);
 
         // If we are benchmarking the sync SDK, close the Async Client and init the sync client
         if(clientType.equals(CosmosDbClientType.SYNC)){
-            asyncClient.close();
             logger.info("Using SYNC client for this workload");
             client = new SyncCosmosDbClient(cosmosConfig);
-        } else {
+        } else if (clientType.equals(CosmosDbClientType.ASYNC)){
             logger.info("Using ASYNC client for this workload");
+            AsyncCosmosDbClient asyncClient = new AsyncCosmosDbClient(cosmosConfig);
+
+            // These function only work with async client for now. todo
+            asyncClient.verifyCollectionsExist(Arrays.asList(routingCollectionName, graphCollectionName));
+
+            // Get keys from each partition for querying
+            idsPerPartition = asyncClient.getIdsPerPartition(routingCollectionName, MAX_IDS_TO_FETCH_PER_PARTITION)
+                                         .toBlocking().single();
+            int partitionCount = idsPerPartition.size();
+            long docCount = idsPerPartition.stream().flatMap(List::stream).count();
+            logger.info("Fetched {} ids from {} partitions.", docCount, partitionCount);
             client = asyncClient;
+        } else if (clientType.equals(CosmosDbClientType.V3_ASYNC)){
+            logger.info("Using V3 ASYNC client for this workload");
+            V3AsyncCosmosDbClient v3AsyncCosmosDbClient = new V3AsyncCosmosDbClient(cosmosConfig);
+
+            // These function only work with async client for now. todo
+            v3AsyncCosmosDbClient.verifyCollectionsExist(Arrays.asList(routingCollectionName, graphCollectionName));
+
+            // Get keys from each partition for querying
+            idsPerPartition = v3AsyncCosmosDbClient.getIdsPerPartition(routingCollectionName, MAX_IDS_TO_FETCH_PER_PARTITION)
+                                         .single().block();
+            int partitionCount = idsPerPartition.size();
+            long docCount = idsPerPartition.stream().flatMap(List::stream).count();
+            logger.info("Fetched {} ids from {} partitions.", docCount, partitionCount);
+            client = v3AsyncCosmosDbClient;
+        } else {
+            throw new RuntimeException("Invalid Cosmos Client type");
         }
     }
 

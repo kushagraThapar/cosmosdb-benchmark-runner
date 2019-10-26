@@ -1,5 +1,7 @@
 package com.adobe.platform.core.identity.services.cosmosdb.client;
 
+import com.azure.data.cosmos.FeedResponseDiagnostics;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -9,6 +11,7 @@ public class SimpleResponse {
     double ruUsed;
     double requestLatencyInMillis;
     String activityId;
+    FeedResponseDiagnostics feedResponseDiagnostics;
 
     public SimpleResponse(List<SimpleDocument> documents, int statusCode, double ruUsed, double requestLatencyInMillis, String activityId) {
         this.documents = documents;
@@ -42,4 +45,11 @@ public class SimpleResponse {
         return activityId;
     }
 
+    public FeedResponseDiagnostics getFeedResponseDiagnostics() {
+        return feedResponseDiagnostics;
+    }
+
+    public void setFeedResponseDiagnostics(FeedResponseDiagnostics feedResponseDiagnostics) {
+        this.feedResponseDiagnostics = feedResponseDiagnostics;
+    }
 }
