@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.RetrySpec;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -194,7 +195,7 @@ public class V4AsyncCosmosDbClient implements CosmosDbClient {
         PartitionKey pk = getPartitionKey(docId);
         return cosmosAsyncContainer.readItem(docId, pk, JsonNode.class)
                 .publishOn(Schedulers.immediate())
-                .retryWhen(errors -> errors.flatMap(error -> {
+                .retryWhen(RetrySpec.withThrowable(errors -> errors.flatMap(error -> {
                             // For IOExceptions, we  retry
                             if (error.getCause() instanceof RequestRateTooLargeException) {
                                 RequestRateTooLargeException rrEx = (RequestRateTooLargeException) error.getCause();
@@ -206,7 +207,7 @@ public class V4AsyncCosmosDbClient implements CosmosDbClient {
                             // For anything else, don't retry
                             return Mono.error(error);
                         })
-                );
+                ));
     }
 
     @Override
