@@ -1,0 +1,156 @@
+Reactor Core upgrade perf benchmark comparison:
+
+ReadLatency - master:
+
+2021-02-22 22:38:49,742       [main] INFO  com.azure.cosmos.benchmark.AsyncReadBenchmark - [1000000] operations performed in [136] seconds.
+2/22/21 10:38:49 PM ============================================================
+
+-- Meters ----------------------------------------------------------------------
+#Successful Operations
+             count = 1000000
+         mean rate = 7327.20 events/second
+     1-minute rate = 7239.88 events/second
+     5-minute rate = 6621.34 events/second
+    15-minute rate = 6369.42 events/second
+#Unsuccessful Operations
+             count = 0
+         mean rate = 0.00 events/second
+     1-minute rate = 0.00 events/second
+     5-minute rate = 0.00 events/second
+    15-minute rate = 0.00 events/second
+
+-- Timers ----------------------------------------------------------------------
+latency
+             count = 1000000
+         mean rate = 7327.70 calls/second
+     1-minute rate = 7241.74 calls/second
+     5-minute rate = 6631.46 calls/second
+    15-minute rate = 6382.93 calls/second
+               min = 0.90 milliseconds
+               max = 145.75 milliseconds
+              mean = 1.34 milliseconds
+            stddev = 1.50 milliseconds
+            median = 1.25 milliseconds
+              75% <= 1.34 milliseconds
+              95% <= 1.59 milliseconds
+              98% <= 2.13 milliseconds
+              99% <= 3.64 milliseconds
+            99.9% <= 9.83 milliseconds
+
+
+ReadLatency - ReactorUpgrade:
+
+2021-02-22 23:22:24,944       [main] INFO  com.azure.cosmos.benchmark.AsyncReadBenchmark - [1000000] operations performed in [134] seconds.
+2/22/21 11:22:24 PM ============================================================
+
+-- Meters ----------------------------------------------------------------------
+#Successful Operations
+             count = 1000000
+         mean rate = 7414.60 events/second
+     1-minute rate = 7275.57 events/second
+     5-minute rate = 6500.45 events/second
+    15-minute rate = 6190.30 events/second
+#Unsuccessful Operations
+             count = 0
+         mean rate = 0.00 events/second
+     1-minute rate = 0.00 events/second
+     5-minute rate = 0.00 events/second
+    15-minute rate = 0.00 events/second
+
+-- Timers ----------------------------------------------------------------------
+latency
+             count = 1000000
+         mean rate = 7415.04 calls/second
+     1-minute rate = 7277.46 calls/second
+     5-minute rate = 6509.82 calls/second
+    15-minute rate = 6202.66 calls/second
+               min = 0.88 milliseconds
+               max = 87.56 milliseconds
+              mean = 1.32 milliseconds
+            stddev = 0.90 milliseconds
+            median = 1.23 milliseconds
+              75% <= 1.32 milliseconds
+              95% <= 1.58 milliseconds
+              98% <= 2.36 milliseconds
+              99% <= 4.03 milliseconds
+            99.9% <= 10.42 milliseconds
+
+
+ReadThroughput - master:
+
+2021-02-22 22:49:24,437       [main] INFO  com.azure.cosmos.benchmark.AsyncReadBenchmark - [1000000] operations performed in [136] seconds.
+2/22/21 10:49:24 PM ============================================================
+
+-- Meters ----------------------------------------------------------------------
+#Successful Operations
+             count = 1000000
+         mean rate = 7337.04 events/second
+     1-minute rate = 7243.24 events/second
+     5-minute rate = 6594.44 events/second
+    15-minute rate = 6330.77 events/second
+#Unsuccessful Operations
+             count = 0
+         mean rate = 0.00 events/second
+     1-minute rate = 0.00 events/second
+     5-minute rate = 0.00 events/second
+    15-minute rate = 0.00 events/second
+
+
+ReadThroughput - ReactorUpgrade:
+
+2021-02-22 23:24:58,143       [main] INFO  com.azure.cosmos.benchmark.AsyncReadBenchmark - [1000000] operations performed in [135] seconds.
+2/22/21 11:24:58 PM ============================================================
+
+-- Meters ----------------------------------------------------------------------
+#Successful Operations
+             count = 1000000
+         mean rate = 7372.59 events/second
+     1-minute rate = 7268.86 events/second
+     5-minute rate = 6536.13 events/second
+    15-minute rate = 6238.55 events/second
+#Unsuccessful Operations
+             count = 0
+         mean rate = 0.00 events/second
+     1-minute rate = 0.00 events/second
+     5-minute rate = 0.00 events/second
+    15-minute rate = 0.00 events/second
+
+
+WriteThroughput - master:
+
+2021-02-22 23:16:16,014       [main] INFO  com.azure.cosmos.benchmark.AsyncWriteBenchmark - [100000] operations performed in [55] seconds.
+2/22/21 11:16:16 PM ============================================================
+
+-- Meters ----------------------------------------------------------------------
+#Successful Operations
+             count = 100000
+         mean rate = 1807.79 events/second
+     1-minute rate = 1684.08 events/second
+     5-minute rate = 1533.40 events/second
+    15-minute rate = 1497.23 events/second
+#Unsuccessful Operations
+             count = 0
+         mean rate = 0.00 events/second
+     1-minute rate = 0.00 events/second
+     5-minute rate = 0.00 events/second
+    15-minute rate = 0.00 events/second
+
+
+WriteThroughput - ReactorUpgrade:
+
+2021-02-22 23:37:54,653       [main] INFO  com.azure.cosmos.benchmark.AsyncWriteBenchmark - [100000] operations performed in [55] seconds.
+2/22/21 11:37:54 PM ============================================================
+
+-- Meters ----------------------------------------------------------------------
+#Successful Operations
+             count = 100000
+         mean rate = 1803.42 events/second
+     1-minute rate = 1709.50 events/second
+     5-minute rate = 1591.86 events/second
+    15-minute rate = 1563.92 events/second
+#Unsuccessful Operations
+             count = 0
+         mean rate = 0.00 events/second
+     1-minute rate = 0.00 events/second
+     5-minute rate = 0.00 events/second
+    15-minute rate = 0.00 events/second
